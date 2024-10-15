@@ -1,5 +1,5 @@
 import POSApp from "./POSApp";
-import { POSProvider } from "./POScontext";
+import { POSProvider } from "./POSContext";
 
 function App() {
   return (
