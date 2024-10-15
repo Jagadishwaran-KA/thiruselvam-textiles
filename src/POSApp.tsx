@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { Plus, Minus, X } from "lucide-react";
-import { usePOSContext } from "./POSContext";
+import { usePOSContext } from "./POSContext.tsx";
 
 const products = [
   "Bedspread",

@@ -1,5 +1,5 @@
-import POSApp from "./POSApp";
-import { POSProvider } from "./POSContext";
+import POSApp from "./POSApp.tsx";
+import { POSProvider } from "./POSContext.tsx";
 
 function App() {
   return (
