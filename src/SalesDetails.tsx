@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { usePOSContext } from "./POSContext";
+import React, { useState } from 'react'
+import { usePOSContext } from './POSContext'
 
 interface SalesDetailsProps {
   onBack: () => void;
@@ -7,23 +7,19 @@ interface SalesDetailsProps {
 
 export default function SalesDetails({ onBack }: SalesDetailsProps) {
   const { bills } = usePOSContext();
-  const [searchId, setSearchId] = useState("");
+  const [searchId, setSearchId] = useState('');
   const [filteredBills, setFilteredBills] = useState(bills);
 
   const handleSearch = () => {
     if (searchId) {
-      setFilteredBills(
-        bills.filter((bill) =>
-          bill.id.toLowerCase().includes(searchId.toLowerCase())
-        )
-      );
+      setFilteredBills(bills.filter(bill => bill.id.toLowerCase().includes(searchId.toLowerCase())));
     } else {
       setFilteredBills(bills);
     }
   };
 
   return (
-    <div className="bg-white rounded-lg shadow-md p-4 flex flex-col h-full">
+    <div className="bg-white rounded-lg shadow-md p-4 flex flex-col h-full w-full max-w-full">
       <h2 className="text-2xl font-semibold mb-4">Sales Details</h2>
       <div className="mb-4 flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-2">
         <input
@@ -46,28 +42,16 @@ export default function SalesDetails({ onBack }: SalesDetailsProps) {
             <table className="min-w-full divide-y divide-gray-200">
               <thead className="bg-gray-50">
                 <tr>
-                  <th
-                    scope="col"
-                    className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                  >
+                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                     Bill ID
                   </th>
-                  <th
-                    scope="col"
-                    className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                  >
+                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                     Date
                   </th>
-                  <th
-                    scope="col"
-                    className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                  >
+                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                     Total
                   </th>
-                  <th
-                    scope="col"
-                    className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                  >
+                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                     Items
                   </th>
                 </tr>
@@ -88,8 +72,7 @@ export default function SalesDetails({ onBack }: SalesDetailsProps) {
                       <ul className="list-disc list-inside">
                         {bill.items.map((item, index) => (
                           <li key={index} className="truncate">
-                            {item.name} - {item.quantity} x{" "}
-                            {item.price.toFixed(2)}
+                            {item.name} - {item.quantity} x {item.price.toFixed(2)}
                           </li>
                         ))}
                       </ul>
@@ -108,5 +91,5 @@ export default function SalesDetails({ onBack }: SalesDetailsProps) {
         Back to POS
       </button>
     </div>
-  );
+  )
 }

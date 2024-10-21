@@ -324,7 +324,7 @@ export default function POSApp() {
                   id="price"
                   type="number"
                   className="w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 py-3 px-4 text-lg"
-                  value={price}
+                  placeholder="0"
                   onChange={(e) => setPrice(Number(e.target.value))}
                   min="0"
                   step="0.01"
