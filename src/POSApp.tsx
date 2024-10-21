@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { Plus, Minus, X } from "lucide-react";
-import { usePOSContext } from "./POSContext.tsx";
+import { usePOSContext } from "./POSContext";
+import SalesDetails from "./SalesDetails";
 
 const products = [
   "Bedspread",
@@ -41,12 +42,13 @@ const products = [
 ];
 
 export default function POSApp() {
-  const { cart, setCart, dailySales, setDailySales } = usePOSContext();
+  const { cart, setCart, dailySales, setDailySales, bills, setBills } =
+    usePOSContext();
   const [search, setSearch] = useState("");
   const [suggestions, setSuggestions] = useState<string[]>([]);
-  const [selectedProduct, setSelectedProduct] = useState("");
   const [quantity, setQuantity] = useState(1);
   const [price, setPrice] = useState(0);
+  const [showSalesDetails, setShowSalesDetails] = useState(false);
 
   useEffect(() => {
     if (search) {
@@ -60,24 +62,23 @@ export default function POSApp() {
   }, [search]);
 
   const handleProductSelect = (product: string) => {
-    setSelectedProduct(product);
-    setSearch("");
+    setSearch(product);
     setSuggestions([]);
   };
 
   const addToCart = () => {
-    if (selectedProduct && quantity > 0 && price > 0) {
+    if (search && quantity > 0 && price > 0) {
       const existingItemIndex = cart.findIndex(
-        (item) => item.name === selectedProduct
+        (item) => item.name.toLowerCase() === search.toLowerCase()
       );
       if (existingItemIndex !== -1) {
         const updatedCart = [...cart];
         updatedCart[existingItemIndex].quantity += quantity;
         setCart(updatedCart);
       } else {
-        setCart([...cart, { name: selectedProduct, quantity, price }]);
+        setCart([...cart, { name: search, quantity, price }]);
       }
-      setSelectedProduct("");
+      setSearch("");
       setQuantity(1);
       setPrice(0);
     }
@@ -101,8 +102,39 @@ export default function POSApp() {
     return cart.reduce((total, item) => total + item.quantity * item.price, 0);
   };
 
+  const generateBillId = () => {
+    return `BILL-${Date.now()}-${Math.floor(Math.random() * 1000)}`;
+  };
+
+  const formatDateTime = () => {
+    const date = new Date();
+
+    // Format date as DD-MM-YYYY
+    const day = String(date.getDate()).padStart(2, "0");
+    const month = String(date.getMonth() + 1).padStart(2, "0");
+    const year = date.getFullYear();
+
+    // Format time as HH:MM:SS
+    const hours = String(date.getHours()).padStart(2, "0");
+    const minutes = String(date.getMinutes()).padStart(2, "0");
+    const seconds = String(date.getSeconds()).padStart(2, "0");
+
+    return `${day}-${month}-${year} ${hours}:${minutes}:${seconds}`;
+  };
+
   const printBill = () => {
     const totalAmount = getTotalAmount();
+    const billId = generateBillId();
+    const newBill = {
+      id: billId,
+      items: [...cart],
+      total: totalAmount,
+      date: new Date().toLocaleString(),
+    };
+
+    setBills([...bills, newBill]);
+    setDailySales((prev) => prev + totalAmount);
+
     const billContent = `
 <!DOCTYPE html>
 <html>
@@ -161,7 +193,8 @@ export default function POSApp() {
     <div class="address">NO:151,VELACHERY MAIN ROAD,KAMARAJAPURAM<br>(near bus stop) CH-73. Ph - 9994286407</div>
   </div>
   <div class="bill-details">
-    Date: ${new Date().toLocaleString()}
+    Bill ID: ${billId}<br>
+    Date: ${formatDateTime()}
   </div>
   <table>
     <tr>
@@ -189,6 +222,7 @@ export default function POSApp() {
   </table>
   <div class="footer">
     Thank you for your purchase!
+    Returns accepted daily between 12 PM and 5 PM
   </div>
 </body>
 </html>
@@ -197,25 +231,35 @@ export default function POSApp() {
     printWindow?.document.write(billContent);
     printWindow?.document.close();
     printWindow?.print();
-  };
 
-  const recordSale = () => {
-    const total = getTotalAmount();
-    setDailySales((prev) => prev + total);
     setCart([]);
   };
 
   const downloadSales = () => {
-    const data = JSON.stringify({
-      date: new Date().toLocaleDateString(),
-      total: dailySales,
+    let csvContent = "Bill ID,Date,Total,Items\n";
+
+    bills.forEach((bill) => {
+      const itemsString = bill.items
+        .map((item) => `${item.name} (${item.quantity} x ${item.price})`)
+        .join("; ");
+      csvContent += `${bill.id},${bill.date},${bill.total.toFixed(
+        2
+      )},"${itemsString}"\n`;
     });
-    const blob = new Blob([data], { type: "text/plain" });
+
+    const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
     const url = URL.createObjectURL(blob);
+
     const link = document.createElement("a");
-    link.download = "daily_sales.txt";
-    link.href = url;
+    link.setAttribute("href", url);
+    link.setAttribute(
+      "download",
+      `sales_data_${new Date().toLocaleDateString()}.csv`
+    );
+    link.style.visibility = "hidden";
+    document.body.appendChild(link);
     link.click();
+    document.body.removeChild(link);
   };
 
   return (
@@ -224,40 +268,35 @@ export default function POSApp() {
         Thiruselvam Textiles POS
       </h1>
 
-      <div className="bg-white rounded-lg shadow-md p-4 mb-6">
-        <h2 className="text-xl font-semibold mb-4">Add Product</h2>
-        <div className="space-y-4">
-          <div className="mb-6">
-            <label
-              htmlFor="search"
-              className="block text-lg font-medium text-gray-700 mb-2"
-            >
-              Search Product
-            </label>
-            <input
-              id="search"
-              className="w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 py-3 px-4 text-lg"
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              placeholder="Type to search..."
-            />
-          </div>
-          {suggestions.length > 0 && (
-            <ul className="bg-white border rounded-md shadow-sm max-h-60 overflow-y-auto">
-              {suggestions.map((product, index) => (
-                <li
-                  key={index}
-                  className="px-4 py-3 hover:bg-gray-100 cursor-pointer text-lg"
-                  onClick={() => handleProductSelect(product)}
-                >
-                  {product}
-                </li>
-              ))}
-            </ul>
-          )}
-          {selectedProduct && (
+      {!showSalesDetails ? (
+        <>
+          <div className="bg-white rounded-lg shadow-md p-4 mb-6">
+            <h2 className="text-xl font-semibold mb-4">Add Product</h2>
             <div className="space-y-4">
-              <p className="text-lg font-medium">Selected: {selectedProduct}</p>
+              <div className="mb-6">
+                <div>
+                  <input
+                    id="search"
+                    className="flex-grow rounded-l-md w-full border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 py-3 px-4 text-lg"
+                    value={search}
+                    onChange={(e) => setSearch(e.target.value)}
+                    placeholder="Type to search or add..."
+                  />
+                </div>
+              </div>
+              {suggestions.length > 0 && (
+                <ul className="bg-white border rounded-md shadow-sm max-h-60 overflow-y-auto">
+                  {suggestions.map((product, index) => (
+                    <li
+                      key={index}
+                      className="px-4 py-3 hover:bg-gray-100 cursor-pointer text-lg"
+                      onClick={() => handleProductSelect(product)}
+                    >
+                      {product}
+                    </li>
+                  ))}
+                </ul>
+              )}
               <div>
                 <label
                   htmlFor="quantity"
@@ -291,86 +330,94 @@ export default function POSApp() {
                   step="0.01"
                 />
               </div>
+              <button
+                onClick={addToCart}
+                className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded-r-md w-full text-lg"
+                disabled={!search || quantity <= 0 || price <= 0}
+              >
+                Add
+              </button>
               <p className="text-lg font-medium">
                 Total: {(quantity * price).toFixed(2)}
               </p>
+            </div>
+          </div>
+
+          <div className="bg-white rounded-lg shadow-md p-4 mb-6">
+            <h2 className="text-xl font-semibold mb-4">Cart</h2>
+            <div className="space-y-4">
+              {cart.map((item, index) => (
+                <div
+                  key={index}
+                  className="flex flex-col p-3 bg-gray-50 rounded"
+                >
+                  <div className="flex justify-between items-center mb-2">
+                    <span className="text-lg font-medium">{item.name}</span>
+                    <button
+                      className="p-1 bg-red-500 text-white rounded"
+                      onClick={() => removeFromCart(index)}
+                    >
+                      <X className="h-5 w-5" />
+                    </button>
+                  </div>
+                  <div className="flex justify-between items-center">
+                    <div className="flex items-center space-x-2">
+                      <button
+                        className="p-1 bg-gray-200 rounded"
+                        onClick={() => updateQuantity(index, item.quantity - 1)}
+                      >
+                        <Minus className="h-5 w-5" />
+                      </button>
+                      <span className="text-lg">{item.quantity}</span>
+                      <button
+                        className="p-1 bg-gray-200 rounded"
+                        onClick={() => updateQuantity(index, item.quantity + 1)}
+                      >
+                        <Plus className="h-5 w-5" />
+                      </button>
+                    </div>
+                    <span className="text-lg font-medium">
+                      {(item.quantity * item.price).toFixed(2)}
+                    </span>
+                  </div>
+                </div>
+              ))}
+            </div>
+            <div className="font-bold mt-4 text-xl">
+              Total: {getTotalAmount().toFixed(2)}
+            </div>
+            <div className="mt-6 space-y-3">
               <button
-                onClick={addToCart}
-                className="w-full bg-blue-500 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded text-lg"
+                onClick={printBill}
+                className="w-full bg-green-500 hover:bg-green-700 text-white font-bold py-3 px-4 rounded text-lg"
               >
-                Add to Cart
+                Print Bill
               </button>
             </div>
-          )}
-        </div>
-      </div>
+          </div>
 
-      <div className="bg-white rounded-lg shadow-md p-4 mb-6">
-        <h2 className="text-xl font-semibold mb-4">Cart</h2>
-        <div className="space-y-4">
-          {cart.map((item, index) => (
-            <div key={index} className="flex flex-col p-3 bg-gray-50 rounded">
-              <div className="flex justify-between items-center mb-2">
-                <span className="text-lg font-medium">{item.name}</span>
-                <button
-                  className="p-1 bg-red-500 text-white rounded"
-                  onClick={() => removeFromCart(index)}
-                >
-                  <X className="h-5 w-5" />
-                </button>
-              </div>
-              <div className="flex justify-between items-center">
-                <div className="flex items-center space-x-2">
-                  <button
-                    className="p-1 bg-gray-200 rounded"
-                    onClick={() => updateQuantity(index, item.quantity - 1)}
-                  >
-                    <Minus className="h-5 w-5" />
-                  </button>
-                  <span className="text-lg">{item.quantity}</span>
-                  <button
-                    className="p-1 bg-gray-200 rounded"
-                    onClick={() => updateQuantity(index, item.quantity + 1)}
-                  >
-                    <Plus className="h-5 w-5" />
-                  </button>
-                </div>
-                <span className="text-lg font-medium">
-                  {(item.quantity * item.price).toFixed(2)}
-                </span>
-              </div>
+          <div className="bg-white rounded-lg shadow-md p-4">
+            <h2 className="text-xl font-semibold mb-4">Daily Sales</h2>
+            <p className="text-lg mb-4">Total: {dailySales.toFixed(2)}</p>
+            <div className="space-y-3">
+              <button
+                onClick={downloadSales}
+                className="w-full bg-purple-500 hover:bg-purple-700 text-white font-bold py-3 px-4 rounded text-lg"
+              >
+                Download Sales Data
+              </button>
+              <button
+                onClick={() => setShowSalesDetails(true)}
+                className="w-full bg-blue-500 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded text-lg"
+              >
+                View Sales Details
+              </button>
             </div>
-          ))}
-        </div>
-        <div className="font-bold mt-4 text-xl">
-          Total: {getTotalAmount().toFixed(2)}
-        </div>
-        <div className="mt-6 space-y-3">
-          <button
-            onClick={printBill}
-            className="w-full bg-green-500 hover:bg-green-700 text-white font-bold py-3 px-4 rounded text-lg"
-          >
-            Print Bill
-          </button>
-          <button
-            onClick={recordSale}
-            className="w-full bg-blue-500 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded text-lg"
-          >
-            Complete Sale
-          </button>
-        </div>
-      </div>
-
-      <div className="bg-white rounded-lg shadow-md p-4">
-        <h2 className="text-xl font-semibold mb-4">Daily Sales</h2>
-        <p className="text-lg mb-4">Total: {dailySales.toFixed(2)}</p>
-        <button
-          onClick={downloadSales}
-          className="w-full bg-purple-500 hover:bg-purple-700 text-white font-bold py-3 px-4 rounded text-lg"
-        >
-          Download Sales Data
-        </button>
-      </div>
+          </div>
+        </>
+      ) : (
+        <SalesDetails onBack={() => setShowSalesDetails(false)} />
+      )}
     </div>
   );
 }
