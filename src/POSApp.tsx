@@ -312,7 +312,7 @@ export default function POSApp() {
                     id="quantity"
                     type="number"
                     className="w-full rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent py-2 px-3"
-                    value={quantity}
+                  
                     onChange={(e) => setQuantity(Number(e.target.value))}
                     min="1"
                   />
