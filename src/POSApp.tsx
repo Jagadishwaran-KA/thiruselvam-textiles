@@ -46,7 +46,7 @@ export default function POSApp() {
     usePOSContext();
   const [search, setSearch] = useState("");
   const [suggestions, setSuggestions] = useState<string[]>([]);
-  const [quantity, setQuantity] = useState(1);
+  const [quantity, setQuantity] = useState(0);
   const [price, setPrice] = useState(0);
   const [showSalesDetails, setShowSalesDetails] = useState(false);
 
@@ -312,8 +312,11 @@ export default function POSApp() {
                     id="quantity"
                     type="number"
                     className="w-full rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent py-2 px-3"
-                  
-                    onChange={(e) => setQuantity(Number(e.target.value))}
+                    value={quantity}
+                    onChange={(e) => {
+                      setQuantity(Number(e.target.value));
+                      e.target.value = "";
+                    }}
                     min="1"
                   />
                 </div>
@@ -328,8 +331,11 @@ export default function POSApp() {
                     id="price"
                     type="number"
                     className="w-full rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent py-2 px-3"
-                    
-                    onChange={(e) => setPrice(Number(e.target.value))}
+                    value={price}
+                    onChange={(e) => {
+                      setPrice(Number(e.target.value));
+                      e.target.value = "";
+                    }}
                     min="0"
                     step="0.01"
                   />
