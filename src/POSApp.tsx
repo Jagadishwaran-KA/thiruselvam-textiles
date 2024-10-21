@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { Plus, Minus, X, Search } from "lucide-react";
 import { usePOSContext } from "./POSContext";
 import SalesDetails from "./SalesDetails";

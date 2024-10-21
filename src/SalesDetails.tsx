@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { usePOSContext } from "./POSContext";
 import { Search, ArrowLeft } from "lucide-react";
 
