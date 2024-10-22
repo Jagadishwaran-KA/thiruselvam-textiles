@@ -140,6 +140,9 @@ export default function POSApp() {
   <meta charset="utf-8">
   <title>Bill</title>
   <style>
+  *{
+    font-weight:900;
+  }
     body {
       font-family: Arial, sans-serif;
       width: 80mm;
