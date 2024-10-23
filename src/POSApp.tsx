@@ -142,6 +142,7 @@ export default function POSApp() {
   <style>
   *{
     font-weight:900;
+    margin-left:6px;
   }
     body {
       font-family: Arial, sans-serif;
@@ -151,12 +152,17 @@ export default function POSApp() {
       font-size: 12px;
       line-height: 1.2;
     }
+    tr{
+       margin-bottom: 30px; 
+      }
     .header {
       text-align: center;
       margin-bottom: 10px;
     }
     .title {
-      font-size: 16px;
+      font-size: 14px;
+      margin-left: -5px;
+      margin-bottom: 2px;
       font-weight: bold;
     }
     .address {
@@ -168,17 +174,18 @@ export default function POSApp() {
     table {
       width: 100%;
       border-collapse: collapse;
+      padding-top: 10px;
     }
     th, td {
       text-align: left;
       padding: 3px 0;
     }
     .amount {
-      text-align: right;
+      marign-left: 10px;
     }
     .total {
       font-weight: bold;
-      border-top: 1px dashed #000;
+      border-top: 0.5px dashed #000;
       padding-top: 5px;
     }
     .footer {
@@ -186,6 +193,9 @@ export default function POSApp() {
       margin-top: 10px;
       font-size: 10px;
     }
+      .bige{
+        font-size:14px;
+      }
   </style>
 </head>
 <body>
@@ -217,13 +227,13 @@ export default function POSApp() {
       )
       .join("")}
     <tr class="total">
-      <td colspan="3">Total Amount:</td>
-      <td class="amount">${totalAmount.toFixed(2)}</td>
+      <td class="bige" colspan="3">Total Amount:</td>
+      <td class="amount bige">${totalAmount.toFixed(2)}</td>
     </tr>
   </table>
   <div class="footer">
-    Thank you for your purchase!
-    Returns accepted daily between 12 PM and 5 PM
+    <p>Thank you <br/>  Returns accepted daily between 12 PM and 5 PM</p>
+   
   </div>
 </body>
 </html>
