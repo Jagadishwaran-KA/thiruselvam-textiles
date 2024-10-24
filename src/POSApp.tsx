@@ -160,13 +160,13 @@ export default function POSApp() {
       margin-bottom: 10px;
     }
     .title {
-      font-size: 14px;
+      font-size: 16px;
       margin-left: -5px;
       margin-bottom: 2px;
       font-weight: bold;
     }
     .address {
-      font-size: 10px;
+      font-size: 12px;
     }
     .bill-details {
       margin-bottom: 10px;
