@@ -153,8 +153,8 @@ export default function POSApp() {
       line-height: 1.2;
     }
     tr{
-       margin-bottom: 30px; 
-      }
+        border-bottom: 1px dashed #000;         
+    }
     .header {
       text-align: center;
       margin-bottom: 10px;
@@ -185,7 +185,7 @@ export default function POSApp() {
     }
     .total {
       font-weight: bold;
-      border-top: 0.5px dashed #000;
+      border-top: 1px dashed #000;
       padding-top: 5px;
     }
     .footer {
@@ -196,12 +196,15 @@ export default function POSApp() {
       .bige{
         font-size:14px;
       }
+        .ph{
+          font-size: 18px;
+        }
   </style>
 </head>
 <body>
   <div class="header">
     <div class="title">THIRUSELVAM TEXTILES</div>
-    <div class="address">NO:151,VELACHERY MAIN ROAD,KAMARAJAPURAM<br>(near bus stop) CH-73. Ph - 9994286407</div>
+    <div class="address">NO:151,VELACHERY MAIN ROAD,KAMARAJAPURAM<br>(near bus stop) CH-73.<span class = "ph"> Ph - 9994286407</span></div>
   </div>
   <div class="bill-details">
     Bill ID: ${billId}<br>
@@ -232,7 +235,7 @@ export default function POSApp() {
     </tr>
   </table>
   <div class="footer">
-    <p>Thank you <br/>  Returns accepted daily between 12 PM and 5 PM</p>
+    <p>Happy Deepavali🧨  Thank you <br/>  Returns accepted daily between 12 PM and 5 PM</p>
    
   </div>
 </body>
